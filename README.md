@@ -175,3 +175,8 @@ These are planned improvements, not features claimed to be implemented in this v
 ## Author
 
 Created as a hands-on networking project to practise enterprise LAN configuration, inter-VLAN routing, and network verification using Cisco Packet Tracer.
+
+## Portfolio
+
+Explore my other networking projects in my
+[Network Engineering Projects portfolio](https://github.com/edwin1data/Network-Engineering-Projects).
