@@ -1,56 +1,65 @@
 # Enterprise VLAN Segmentation and Inter-VLAN Routing Lab
 
-## Overview
+A Cisco Packet Tracer project demonstrating VLAN segmentation, IEEE 802.1Q trunking, DHCP configuration, and router-on-a-stick inter-VLAN routing in a simulated enterprise LAN.
 
-This project demonstrates the design, configuration, and verification of a segmented enterprise LAN using Cisco Packet Tracer.
+## Project Overview
 
-The network uses VLANs to separate HR and Management devices into distinct broadcast domains. A Cisco 2901 router provides DHCP services and enables communication between the VLANs through router-on-a-stick inter-VLAN routing.
+This project simulates an enterprise network in which HR and Management devices are separated into different VLANs while retaining the ability to communicate through a central router.
 
-Two Cisco 3560 multilayer switches connect the end devices and carry VLAN traffic over IEEE 802.1Q trunk links.
+The network consists of a Cisco 2901 router, two Cisco 3560 multilayer switches, and multiple end devices.
 
-The implementation was tested successfully: PCs received IP addresses and default gateways through DHCP, reached their respective gateways, and communicated with devices in the other VLAN.
+Router0 provides DHCP services and performs inter-VLAN routing using 802.1Q subinterfaces. The switches provide VLAN segmentation and trunk connectivity.
+
+The implementation was verified through DHCP assignment, gateway reachability, and successful ping tests between VLANs.
 
 ## Objectives
 
-* Implement VLAN-based network segmentation.
-* Configure access ports for end devices.
-* Configure IEEE 802.1Q trunk links.
+* Segment end devices into separate VLANs.
+* Configure access ports and 802.1Q trunk links.
 * Implement router-on-a-stick inter-VLAN routing.
-* Configure DHCP pools for multiple subnets.
-* Verify connectivity using ICMP ping tests.
-* Inspect VLANs, trunks, interfaces, and neighboring devices using Cisco IOS commands.
+* Configure DHCP pools for multiple IPv4 subnets.
+* Verify VLAN membership and trunk operation.
+* Test gateway reachability and end-to-end connectivity.
+* Document the configuration and verification process.
 
 ## Network Topology
 
-The lab contains:
+![Enterprise VLAN Network Topology](topology/vlan-topology.png)
 
-* One Cisco 2901 router.
-* Two Cisco 3560 multilayer switches.
-* Multiple end devices distributed across VLANs 10 and 20.
+### Devices
 
-The router connects to Switch0 through GigabitEthernet0/0 on the router and GigabitEthernet0/1 on Switch0.
+| Device      | Model      | Role                                  |
+| ----------- | ---------- | ------------------------------------- |
+| Router0     | Cisco 2901 | DHCP services and inter-VLAN routing  |
+| Switch0     | Cisco 3560 | VLAN access connectivity and trunking |
+| Switch1     | Cisco 3560 | VLAN access connectivity and trunking |
+| End devices | PCs        | Clients in VLAN 10 and VLAN 20        |
+
+## Network Architecture
+
+Router0 connects to Switch0 through Router0 GigabitEthernet0/0 and Switch0 GigabitEthernet0/1.
 
 Switch0 connects to Switch1 through GigabitEthernet0/2 on both switches.
 
+Router0 uses subinterfaces to provide the default gateways for the two VLANs. IEEE 802.1Q trunk links carry VLAN traffic between the router and switch and between the switches.
+
 ## VLAN and IP Addressing
 
-| VLAN ID | VLAN Name  | Network         | Default Gateway |
-| ------- | ---------- | --------------- | --------------- |
-| 10      | HR         | 192.168.10.0/24 | 192.168.10.1    |
-| 20      | Management | 192.168.20.0/24 | 192.168.20.1    |
+| VLAN ID | VLAN Name  | Network         | Subnet Mask   | Default Gateway |
+| ------- | ---------- | --------------- | ------------- | --------------- |
+| 10      | HR         | 192.168.10.0/24 | 255.255.255.0 | 192.168.10.1    |
+| 20      | Management | 192.168.20.0/24 | 255.255.255.0 | 192.168.20.1    |
 
-Both VLANs use separate IPv4 subnets.
-
-## Technologies and Protocols
+## Technologies Used
 
 * Cisco Packet Tracer
 * Cisco IOS CLI
 * VLANs
 * IEEE 802.1Q trunking
 * Router-on-a-stick
-* Dynamic Host Configuration Protocol (DHCP)
+* DHCP
 * IPv4 addressing and subnetting
-* Internet Control Message Protocol (ICMP)
+* ICMP
 * Cisco Discovery Protocol (CDP)
 * Per-VLAN Spanning Tree (PVST)
 
@@ -58,104 +67,111 @@ Both VLANs use separate IPv4 subnets.
 
 ### 1. VLAN Configuration
 
-VLAN 10 and VLAN 20 were created on both switches.
-
-* VLAN 10 represents the HR network.
-* VLAN 20 represents the Management network.
-
-Access ports were assigned to the appropriate VLAN based on the intended end-device connections.
+VLAN 10 (`hr`) and VLAN 20 (`management`) were configured on both switches. Access ports were assigned to the appropriate VLANs according to the network design.
 
 ### 2. Trunk Configuration
 
-IEEE 802.1Q trunking was configured on the router-facing and inter-switch links.
+IEEE 802.1Q trunking was configured on the router-facing and inter-switch links. The inter-switch trunk carries VLANs 10 and 20.
 
-The inter-switch trunk was configured to allow VLANs 10 and 20.
-
-Trunk operation was inspected using `show interfaces trunk`.
+Trunk status and allowed VLANs were checked using Cisco IOS verification commands.
 
 ### 3. Inter-VLAN Routing
 
-Router0 uses two subinterfaces on GigabitEthernet0/0:
+Router0 uses the following subinterfaces:
 
 | Interface             | VLAN | IP Address      |
 | --------------------- | ---- | --------------- |
 | GigabitEthernet0/0.10 | 10   | 192.168.10.1/24 |
 | GigabitEthernet0/0.20 | 20   | 192.168.20.1/24 |
 
-IEEE 802.1Q encapsulation associates each subinterface with its corresponding VLAN.
+The subinterfaces use IEEE 802.1Q encapsulation to associate incoming and outgoing traffic with the correct VLAN.
 
-The router routes traffic between the two IP subnets.
+The router provides Layer 3 connectivity between the two IPv4 subnets.
 
 ### 4. DHCP Configuration
 
-Separate DHCP pools were configured for VLAN 10 and VLAN 20.
+Separate DHCP pools were configured on Router0 for VLAN 10 and VLAN 20.
 
-The router excludes the following address ranges from dynamic assignment:
+The following address ranges were excluded from dynamic assignment:
 
-* 192.168.10.1–192.168.10.10
-* 192.168.20.1–192.168.20.10
+* VLAN 10: 192.168.10.1–192.168.10.10
+* VLAN 20: 192.168.20.1–192.168.20.10
 
-The DHCP pools provide subnet information, default gateways, DNS server information, and a domain name to clients.
+All PCs successfully received IP configuration through DHCP.
 
-### 5. Network Verification
+## Verification and Testing
 
-The following Cisco IOS commands were used to inspect the configuration and operational state.
+The following commands were used to inspect and verify the network configuration.
 
-| Command                   | Purpose                                          |
-| ------------------------- | ------------------------------------------------ |
-| `show running-config`     | Inspect device configuration                     |
-| `show vlan brief`         | Verify VLANs and access-port assignments         |
-| `show interfaces trunk`   | Verify operational trunk links and allowed VLANs |
-| `show ip interface brief` | Inspect interface status and IP addressing       |
-| `show ip route`           | Inspect the routing table                        |
-| `show cdp neighbors`      | Identify directly connected Cisco devices        |
+| Command                   | Purpose                                   |
+| ------------------------- | ----------------------------------------- |
+| `show running-config`     | Inspect the device configuration          |
+| `show vlan brief`         | Verify VLANs and access-port membership   |
+| `show interfaces trunk`   | Inspect trunk status and allowed VLANs    |
+| `show ip interface brief` | Check interface status and IP addressing  |
+| `show ip route`           | Inspect the routing table                 |
+| `show cdp neighbors`      | Identify directly connected Cisco devices |
 
-## Testing and Results
+### Test Results
 
-| Test                             | Result                |
-| -------------------------------- | --------------------- |
-| DHCP address assignment          | Successful on all PCs |
-| Default gateway assignment       | Successful            |
-| Ping from VLAN 10 to its gateway | Successful            |
-| Ping from VLAN 20 to its gateway | Successful            |
-| Ping between VLAN 10 and VLAN 20 | Successful            |
+| Test                                      | Result            |
+| ----------------------------------------- | ----------------- |
+| DHCP address assignment                   | Passed on all PCs |
+| Default gateway assignment                | Passed            |
+| VLAN 10 PC to gateway                     | Successful        |
+| VLAN 20 PC to gateway                     | Successful        |
+| Communication between VLAN 10 and VLAN 20 | Successful        |
 
-These results confirm that DHCP address assignment, gateway reachability, and inter-VLAN communication are working in the simulated environment.
+These results confirm successful DHCP assignment, gateway reachability, and inter-VLAN communication in the simulated environment.
 
-## Key Learning Outcomes
+## Project Files
 
-Through this project, I practised:
+| Path                                   | Description                  |
+| -------------------------------------- | ---------------------------- |
+| `topology/vlan-lab.pkt`                | Cisco Packet Tracer project  |
+| `topology/vlan-topology.png`           | Network topology image       |
+| `configurations/router0.txt`           | Router configuration export  |
+| `configurations/switch0.txt`           | Switch0 configuration export |
+| `configurations/switch1.txt`           | Switch1 configuration export |
+| `documentation/ip-addressing-table.md` | IP addressing plan           |
+| `documentation/vlan-port-mapping.md`   | VLAN and port mapping        |
+| `screenshots/`                         | Verification evidence        |
 
-* Segmenting a LAN using VLANs.
-* Assigning access ports to the correct VLANs.
-* Configuring and verifying 802.1Q trunks.
-* Implementing router-on-a-stick inter-VLAN routing.
-* Providing IPv4 configuration through DHCP.
-* Verifying connectivity with ICMP.
-* Inspecting network devices using Cisco IOS operational commands.
-* Using CDP to identify neighboring devices and connected interfaces.
+## Skills Demonstrated
+
+* VLAN creation and segmentation
+* Switch access-port configuration
+* IEEE 802.1Q trunking
+* Router-on-a-stick inter-VLAN routing
+* DHCP configuration and verification
+* IPv4 addressing and subnetting
+* Network connectivity testing
+* Cisco IOS configuration inspection
+* CDP neighbor discovery
+* Technical documentation
 
 ## Future Improvements
 
-Potential extensions to this lab include:
+Potential extensions include:
 
-* Configure SSH for secure device administration.
-* Apply port security to access ports.
-* Implement DHCP snooping and Dynamic ARP Inspection where supported.
-* Restrict trunk allowed-VLAN lists to the minimum required.
-* Configure and verify appropriate spanning-tree root bridge placement.
-* Add network monitoring using SNMP and a monitoring platform.
-* Introduce documented fault scenarios and troubleshooting procedures.
+* Secure device administration using SSH.
+* Port security on access ports.
+* DHCP snooping and Dynamic ARP Inspection where supported.
+* Tighter trunk allowed-VLAN lists.
+* Spanning-tree root bridge planning.
+* SNMP-based network monitoring and alerting.
+* Documented fault scenarios for troubleshooting practice.
 
-These are proposed improvements, not features claimed to be implemented in the current lab.
+These are planned improvements, not features claimed to be implemented in this version.
 
-## Repository Contents
+## How to Use
 
-* `topology/` — Packet Tracer project and topology image.
-* `configurations/` — Router and switch configuration exports.
-* `documentation/` — Addressing and VLAN documentation.
-* `screenshots/` — Configuration and connectivity verification evidence.
+1. Download the `.pkt` file from the `topology/` directory.
+2. Open it using a compatible version of Cisco Packet Tracer.
+3. Inspect the router and switch configurations.
+4. Use the verification commands documented above.
+5. Repeat the DHCP and connectivity tests to reproduce the results.
 
 ## Author
 
-Networking lab project developed using Cisco Packet Tracer for hands-on practice in enterprise LAN configuration and verification.
+Created as a hands-on networking project to practise enterprise LAN configuration, inter-VLAN routing, and network verification using Cisco Packet Tracer.
