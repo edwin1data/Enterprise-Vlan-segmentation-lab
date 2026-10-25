@@ -24,7 +24,7 @@ The implementation was verified through DHCP assignment, gateway reachability, a
 
 ## Network Topology
 
-![Enterprise VLAN Network Topology](https://github.com/edwin1data/Enterprise-Vlan-segmentation-lab/tree/main/topology/vlan-topology.png)
+![Enterprise VLAN Network Topology](topology/vlan-topology.png)
 
 ### Devices
 
